@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <title>GERENCIADOR DE ATIVIDADES</title>
+    <style>
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Times New Roman', Times, serif;
+            text-align: center;
+            font-size: 16px;
+            letter-spacing: 1px;
+            background-color: rgb(222, 234, 245);
+            margin: 0; 
+        }
+
+        h1 {
+            margin-top: 20px;
+            font: bold 12pt Comic Sans MS;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0 auto; 
+            max-width: 1200px; 
+        }
+
+        .vertical {
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+            max-width: 300px;
+        }
+
+        section {
+            background-color: rgb(199, 199, 199);
+            width: 100%; 
+            max-width: 300px;
+            padding: 10px;
+            text-align: center;
+            border: 3px solid red;
+            margin-top: 20px;
+            border-radius: 9px;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            margin: 10px;
+            width: 100%;
+        }
+
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .task-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>GERENCIADOR DE ATIVIDADES</h1>
+    <div class="container">
+        <div class="vertical">
+            <section id="0-section"> <!-- Domingo -->
+                <h1>Domingo</h1>
+            </section>
+        </div>
+        <div class="vertical">
+            <section id="1-section"> <!-- Segunda-feira -->
+                <h1>Segunda-feira</h1>
+            </section>
+        </div>
+        <div class="vertical">
+            <section id="2-section"> <!-- Terça-feira -->
+                <h1>Terça-feira</h1>
+            </section>
+        </div>
+        <div class="vertical">
+            <section id="3-section"> <!-- Quarta-feira -->
+                <h1>Quarta-feira</h1>
+            </section>
+        </div>
+        <div class="vertical">
+            <section id="4-section"> <!-- Quinta-feira -->
+                <h1>Quinta-feira</h1>
+            </section>
+        </div>
+        <div class="vertical">
+            <section id="5-section"> <!-- Sexta-feira -->
+                <h1>Sexta-feira</h1>
+            </section>
+        </div>
+        <div class="vertical">
+            <section id="6-section"> <!-- Sábado -->
+                <h1>Sábado</h1>
+            </section>
+        </div>
+    </div>
+
+    <div id="adicionar" style="margin-top: 90px;">
+        <input type="text" id="task-name" placeholder="nome da tarefa" style="width: 150px;">
+        <input type="date" id="task-date" style="width: 150px;">
+        <input type="time" id="task-time">       
+        <input type="number" id="task-repeat" placeholder="repetir a cada(dias)" style="width: 150px;">
+        <input type="number" id="task-for" placeholder="por quantos(dias)" style="width: 150px;">
+        <button onclick="adc()" style="background-color: rgb(199, 199, 199);">adicionar tarefa</button>
+        <button onclick="concluirTarefa()" style="background-color: rgb(199, 199, 199);">concluir tarefa</button>
+        <button onclick="apagartudo()" style="background-color: rgb(199, 199, 199);">apagar tudo</button>
+    </div>
+
+    <script>
+        function loadTasks() {
+            for (let i = 0; i < 7; i++) {
+                const daySection = document.getElementById(`${i}-section`);
+                const savedTasks = JSON.parse(localStorage.getItem(`tasks-${i}`)) || [];
+
+                savedTasks.forEach((task) => {
+                    const newTask = document.createElement("div");
+                    newTask.classList.add("task-item");
+
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+
+                    const taskInfo = document.createElement("p");
+                    taskInfo.textContent = task;
+
+                    newTask.appendChild(checkbox);
+                    newTask.appendChild(taskInfo);
+
+                    daySection.appendChild(newTask);
+                });
+            }
+        }
+
+        function saveTasks() {
+            for (let i = 0; i < 7; i++) {
+                const daySection = document.getElementById(`${i}-section`);
+                const tasks = Array.from(daySection.getElementsByClassName("task-item"))
+                    .map((taskItem) => taskItem.querySelector("p").textContent);
+
+                localStorage.setItem(`tasks-${i}`, JSON.stringify(tasks));
+            }
+        }
+
+        function apagartudo() {
+    if (confirm("Tem certeza de que deseja apagar todas as tarefas?")) {
+        for (let i = 0; i < 7; i++) {
+            const daySection = document.getElementById(`${i}-section`);
+            const children = Array.from(daySection.children); // Obtém uma matriz dos elementos filhos
+
+            // Remove todos os elementos filhos, exceto o primeiro elemento (que é o <h1>)
+            for (let j = children.length - 1; j > 0; j--) {
+                daySection.removeChild(children[j]);
+            }
+
+            // Limpa o armazenamento local
+            localStorage.removeItem(`tasks-${i}`);
+        }
+    }
+}
+function adc() {
+    const taskName = document.getElementById("task-name").value;
+    const taskDate = document.getElementById("task-date").value;
+    const taskTime = document.getElementById("task-time").value;
+    const taskRepeat = parseInt(document.getElementById("task-repeat").value);
+    const taskFor = parseInt(document.getElementById("task-for").value);
+
+    if (taskDate && taskName && taskTime && taskFor && (taskRepeat !== undefined && taskRepeat !== null)) {
+        if (taskRepeat < 0) {
+            alert("Por favor, insira um número natural válido para 'repetir a cada (dias) mínimo 0'.");
+            return;
+        }
+        if (taskFor <= 0) {
+            alert("Por favor, insira um número natural válido para 'por quantos(dias) mínimo 1'.");
+            return;
+        }
+
+        if (taskRepeat === 0) {
+            // Tarefa única
+            const dateParts = taskDate.split('-');
+            const hours = parseInt(taskTime.split(':')[0]);
+            const minutes = parseInt(taskTime.split(':')[1]);
+            const localDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], hours, minutes);
+
+            addTask(taskName, localDate);
+        }
+
+        if (taskRepeat > 0) {
+            // Tarefas repetidas
+            const dateParts = taskDate.split('-');
+            const hours = parseInt(taskTime.split(':')[0]);
+            const minutes = parseInt(taskTime.split(':')[1]);
+            const startDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], hours, minutes);
+
+            for (let i = 0; i < taskFor; i += taskRepeat) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + i);
+
+                addTask(taskName, currentDate);
+            }
+        }
+
+        reordenar(); // Chame a função de reordenar após adicionar ou concluir tarefas
+        document.getElementById("task-name").value = "";
+        document.getElementById("task-date").value = "";
+        document.getElementById("task-time").value = "";
+        document.getElementById("task-repeat").value = "";
+        document.getElementById("task-for").value = "";
+        saveTasks();
+    } else {
+        alert("Por favor, preencha todos os campos corretamente.");
+    }
+}
+
+function addTask(taskName, taskDateTime) {
+    const newTask = document.createElement("div");
+    newTask.classList.add("task-item");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+
+    const taskInfo = document.createElement("p");
+    const formattedDate = taskDateTime.toLocaleDateString('pt-BR');
+    const formattedTime = taskDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    taskInfo.textContent = `Data: ${formattedDate}, Horário: ${formattedTime}, Tarefa: ${taskName}`;
+
+    newTask.setAttribute("data-datetime", taskDateTime.getTime()); // Armazene a data e hora em milissegundos
+    newTask.appendChild(checkbox);
+    newTask.appendChild(taskInfo);
+
+    var dayOfWeek = taskDateTime.getDay();
+    const daySection = document.getElementById(`${dayOfWeek}-section`);
+    const tasks = daySection.getElementsByClassName("task-item");
+
+    let insertIndex = 0;
+    for (let i = 0; i < tasks.length; i++) {
+        const taskTime = parseFloat(tasks[i].getAttribute("data-datetime"));
+
+        if (taskDateTime.getTime() < taskTime) {
+            break;
+        }
+        insertIndex++;
+    }
+
+    if (insertIndex === tasks.length) {
+        daySection.appendChild(newTask);
+    } else {
+        daySection.insertBefore(newTask, tasks[insertIndex]);
+    }
+}
+
+function reordenar() {
+    for (let i = 0; i < 7; i++) {
+        const daySection = document.getElementById(`${i}-section`);
+        const tasks = Array.from(daySection.getElementsByClassName("task-item"));
+
+        tasks.sort((a, b) => {
+            const aDateTime = parseFloat(a.getAttribute("data-datetime"));
+            const bDateTime = parseFloat(b.getAttribute("data-datetime"));
+
+            return aDateTime - bDateTime;
+        });
+
+        const sectionTitle = daySection.querySelector("h1");
+        while (daySection.firstChild) {
+            if (daySection.firstChild !== sectionTitle) {
+                daySection.removeChild(daySection.firstChild);
+            } else {
+                break; // Evita a remoção do h1
+            }
+        }
+              // Adiciona as tarefas na ordem correta
+              tasks.forEach((task) => {
+            daySection.appendChild(task);
+        });
+    }
+}
+
+        function concluirTarefa() {
+            const checkboxes = document.querySelectorAll('.task-item input[type="checkbox"]:checked');
+            if (checkboxes.length === 0) {
+                alert("Nenhuma tarefa selecionada para concluir.");
+            } else {
+                checkboxes.forEach((checkbox) => {
+                    const taskItem = checkbox.parentElement;
+                    taskItem.style.transition = "opacity 0.5s";
+                    taskItem.style.opacity = 0;
+                    setTimeout(() => {
+                        taskItem.remove();
+                        reordenar();
+                        saveTasks();
+                    }, 500);
+                });
+            }
+        }
+        loadTasks();
+    </script>
+</body>
+</html>
