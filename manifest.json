@@ -2,7 +2,7 @@
     "name": "GERENCIADOR DE ATIVIDADES",
     "short_name": "gerenciador",
     "description": "gerencie suas tarefas fácil",
-    "start_url": "http://127.0.0.1:5500/gerenciador-de-tarefas.html",
+    "start_url": "https://viniciusbenetti.github.io/manifest/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#3498db",
