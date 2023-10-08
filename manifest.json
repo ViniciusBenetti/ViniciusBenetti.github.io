@@ -1,0 +1,16 @@
+{
+    "name": "GERENCIADOR DE ATIVIDADES",
+    "short_name": "gerenciador",
+    "description": "gerencie suas tarefas fácil",
+    "start_url": "gerenciadordeatividades.com",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3498db",
+    "icons": [
+        {
+            "src": "planner.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ]
+}
